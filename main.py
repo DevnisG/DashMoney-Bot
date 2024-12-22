@@ -6,6 +6,7 @@ from manager.data_manager import load_local_data
 from commands.bot_commands import setup_commands
 from config.message_formatter import format_message
 from manager.config_manager import load_config, save_config
+from commands.bot_tasks import setup_tasks  
 
 # Discord Config:
 intents = discord.Intents.default()
@@ -18,6 +19,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or("!"), intents=inten
 @bot.event
 async def on_ready():
     print(f"[INFO] Bot iniciado como {bot.user}")
+    setup_tasks(bot)  
     config = load_config()
     if config.get("channel_id"):
         channel = bot.get_channel(config["channel_id"])

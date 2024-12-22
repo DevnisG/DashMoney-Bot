@@ -11,6 +11,9 @@ from config.constants import DOLLAR_API_VALUES, DOLLAR_API_STATE
 # Var for Checking Global Task:
 tasks_started = False
 
+# Global variable for bot instance
+_bot = None
+
 # Async Func for Updating Dashboard MSG:
 async def perform_dashboard_update(bot):
     print("[INFO] Ejecutando tarea de actualización del dashboard...")
@@ -70,17 +73,19 @@ async def perform_dashboard_update(bot):
     else:
         print("[INFO] Sin cambios detectados en los datos.")
 
-# Task Loop Every (5 Hours)
-@tasks.loop(hours=5)
-async def update_dashboard_loop(bot):
-    await perform_dashboard_update(bot)
+# Task Loop Every (3 Hours)
+@tasks.loop(hours=3)
+async def update_dashboard_loop():
+    global _bot
+    await perform_dashboard_update(_bot)
 
 # Func for Setup Tasks:
 def setup_tasks(bot):
-    global tasks_started
+    global tasks_started, _bot
+    _bot = bot
     if not tasks_started:
         if not update_dashboard_loop.is_running():
-            update_dashboard_loop.start(bot)
+            update_dashboard_loop.start()
             print("[INFO] Bucle de actualización del dashboard iniciado.")
         bot.loop.create_task(perform_dashboard_update(bot))
         tasks_started = True
